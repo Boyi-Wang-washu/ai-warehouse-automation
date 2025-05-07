@@ -22,3 +22,6 @@ jobs:
 
       - name: Run weekly_reporter.py
         run: python weekly_reporter.py
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_APP_PASS: ${{ secrets.SMTP_APP_PASS }}

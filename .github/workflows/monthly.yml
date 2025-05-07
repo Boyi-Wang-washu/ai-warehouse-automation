@@ -22,3 +22,6 @@ jobs:
 
       - name: Run monthly_analyzer.py
         run: python monthly_analyzer.py
+          env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_APP_PASS: ${{ secrets.SMTP_APP_PASS }}
