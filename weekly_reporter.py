@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from predictor import load_order_data, forecast_product_demand
-from gmail_api_sender import send_email
+from email_sender import send_email
 import os
 
 def generate_weekly_report(order_file="order_history.csv", inventory_file="inventory.xlsx"):

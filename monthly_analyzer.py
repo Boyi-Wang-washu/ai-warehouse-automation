@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime, timedelta
 from predictor import load_order_data, forecast_product_demand
-from gmail_api_sender import send_email
+from email_sender import send_email
 
 def generate_monthly_trend_report(order_file="order_history.csv", inventory_file="inventory.xlsx"):
     df_orders = load_order_data(order_file)

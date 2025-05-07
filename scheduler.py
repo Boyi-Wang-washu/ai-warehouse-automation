@@ -1,7 +1,7 @@
 from email_reader import extract_order_info
 from inventory_updater import update_inventory
 from stock_checker import check_and_generate_restock_messages
-from gmail_api_sender import send_email
+from email_sender import send_email
 
 def run_warehouse_automation():
     # 1️⃣ 模拟邮件内容（也可以从真实邮箱读取）
