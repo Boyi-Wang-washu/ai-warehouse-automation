@@ -8,7 +8,11 @@ import os
 def generate_weekly_report(order_file="order_history.csv", inventory_file="inventory.xlsx"):
     df_orders = load_order_data(order_file)
     df_inventory = pd.read_excel(inventory_file)
-
+    # ========== 新增：若订单文件为空，直接结束 ==========
+    if df_orders.empty:
+        print("⚠️ 本周没有任何订单数据，已跳过报告生成。")
+        return
+    # ===================================================
     today = datetime.today()
     last_week = today - timedelta(days=7)
 
@@ -17,6 +21,12 @@ def generate_weekly_report(order_file="order_history.csv", inventory_file="inven
 
     # 统计各型号本周销量
     df_summary = df_week.groupby("型号")["数量"].sum().reset_index()
+    
+    # ========== 新增：若本周汇总为空，直接结束 ==========
+    if df_summary.empty:
+        print("⚠️ 本周订单列表为空，已跳过报告生成。")
+        return
+    # ===================================================
 
     report_lines = ["📊 本周库存与订单报告\n"]
     for _, row in df_summary.iterrows():
