@@ -4,7 +4,9 @@ from stock_checker import check_and_generate_restock_messages
 from email_sender import send_email
 
 def run_warehouse_automation():
-    # 1️⃣ 模拟邮件内容（也可以从真实邮箱读取）
+    # 1️⃣ Simulate email content (can also read from real mailbox)
+    # Note: The Chinese test data below is kept for demonstration purposes
+    # In production, this would be replaced with real English email content
     email_content = """
     订单编号：#20250412-001
     客户姓名：李四
@@ -15,31 +17,31 @@ def run_warehouse_automation():
     客户邮箱：lisi@gmail.com
     """
 
-    # 2️⃣ 提取订单信息
-    print("📩 正在提取订单信息...")
+    # 2️⃣ Extract order information
+    print("📩 Extracting order information...")
     order_info = extract_order_info(email_content)
-    print("✅ 提取成功：", order_info)
+    print("✅ Extraction successful:", order_info)
 
-    # 3️⃣ 更新库存
-    print("📦 正在更新库存...")
+    # 3️⃣ Update inventory
+    print("📦 Updating inventory...")
     update_inventory(order_info, "inventory.xlsx")
-    print("✅ 库存已更新")
+    print("✅ Inventory updated")
 
-    # 4️⃣ 检查低库存 → 生成补货提醒
-    print("📉 正在检查低库存产品...")
+    # 4️⃣ Check low inventory → Generate restocking reminders
+    print("📉 Checking low inventory products...")
     restock_messages = check_and_generate_restock_messages("inventory.xlsx")
 
-    # 5️⃣ 发送提醒邮件
+    # 5️⃣ Send reminder emails
     if not restock_messages:
-        print("✅ 所有产品库存充足，无需补货。")
+        print("✅ All products have sufficient inventory, no restocking needed.")
     else:
         for recipient, messages in restock_messages.items():
-            subject = "【AI自动提醒】以下产品库存不足，请及时补货"
+            subject = "【AI Auto Alert】The following products have insufficient inventory, please restock promptly"
             content = "\n\n".join(messages)
-            print(f"📬 向 {recipient} 发送邮件...")
+            print(f"📬 Sending email to {recipient}...")
             send_email(recipient, subject, content)
 
-    print("\n🎉 自动化流程已全部完成！")
+    print("\n🎉 Automation workflow completed!")
 
 if __name__ == "__main__":
     run_warehouse_automation()

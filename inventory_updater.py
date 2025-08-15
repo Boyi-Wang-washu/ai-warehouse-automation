@@ -2,43 +2,49 @@ import pandas as pd
 
 def update_inventory(order_info, inventory_file="inventory.xlsx"):
     """
-    根据订单信息更新库存 Excel 表格
+    Update inventory Excel table based on order information
+    
+    Note: The Chinese column names ('型号', '当前库存') are from the Excel file structure
+    and are kept for data compatibility. In a production environment, these could be
+    standardized to English column names.
     """
-    # 读取库存 Excel 表格
+    # Read inventory Excel table
     df = pd.read_excel(inventory_file)
 
     for item in order_info['products']:
         model = item['model']
         quantity = item['quantity']
 
-        # 查找型号对应的库存记录
+        # Find inventory record matching the model
+        # Note: '型号' means 'Model' in Chinese, kept for Excel compatibility
         match = df[df['型号'] == model]
 
         if not match.empty:
             current_index = match.index[0]
+            # Note: '当前库存' means 'Current Inventory' in Chinese
             current_stock = df.at[current_index, '当前库存']
 
-            # 扣减库存数量
+            # Deduct inventory quantity
             new_stock = max(0, current_stock - quantity)
             df.at[current_index, '当前库存'] = new_stock
 
-            print(f"已更新：{item['name']}（{model}） 库存从 {current_stock} → {new_stock}")
+            print(f"Updated: {item['name']} ({model}) inventory from {current_stock} → {new_stock}")
         else:
-            print(f"⚠️ 找不到型号为 {model} 的产品，无法更新库存")
+            print(f"⚠️ Product with model {model} not found, cannot update inventory")
 
-    # 保存更新后的库存表
+    # Save updated inventory table
     df.to_excel(inventory_file, index=False)
-    print("✅ 库存已更新并保存。")
+    print("✅ Inventory updated and saved.")
 
 
-# 测试代码
+# Test code
 if __name__ == "__main__":
-    # 你可以把这里换成 email_reader.py 解析出的结果
+    # You can replace this with the result parsed from email_reader.py
     sample_order = {
         'order_number': '20250401-001',
         'products': [
-            {'name': 'A4打印纸', 'model': 'P500', 'quantity': 20},
-            {'name': '无线鼠标', 'model': 'M102', 'quantity': 5}
+            {'name': 'A4 Paper', 'model': 'P500', 'quantity': 20},
+            {'name': 'Wireless Mouse', 'model': 'M102', 'quantity': 5}
         ]
     }
 

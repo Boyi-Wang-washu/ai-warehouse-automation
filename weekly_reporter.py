@@ -6,63 +6,75 @@ from email_sender import send_email
 import os
 
 def generate_weekly_report(order_file="order_history.csv", inventory_file="inventory.xlsx"):
+    """
+    Generate weekly inventory and order trend report
+    
+    Note: The Chinese column names are from the data file structure:
+    '日期' = 'Date', '型号' = 'Model', '数量' = 'Quantity'
+    '产品名称' = 'Product Name', '当前库存' = 'Current Inventory'
+    """
     df_orders = load_order_data(order_file)
     df_inventory = pd.read_excel(inventory_file)
-    # ========== 新增：若订单文件为空，直接结束 ==========
+    # ========== NEW: If order file is empty, skip report generation ==========
     if df_orders.empty:
-        print("⚠️ 本周没有任何订单数据，已跳过报告生成。")
+        print("⚠️ No order data this week, skipping report generation.")
         return
     # ===================================================
     today = datetime.today()
     last_week = today - timedelta(days=7)
 
-    # 筛选最近7天的订单
+    # Filter orders from last 7 days
+    # Note: '日期' means 'Date' in Chinese
     df_week = df_orders[df_orders["日期"] >= last_week]
 
-    # 统计各型号本周销量
+    # Calculate weekly sales by model
+    # Note: '型号' means 'Model', '数量' means 'Quantity' in Chinese
     df_summary = df_week.groupby("型号")["数量"].sum().reset_index()
     
-    # ========== 新增：若本周汇总为空，直接结束 ==========
+    # ========== NEW: If weekly summary is empty, skip report generation ==========
     if df_summary.empty:
-        print("⚠️ 本周订单列表为空，已跳过报告生成。")
+        print("⚠️ Weekly order list is empty, skipping report generation.")
         return
     # ===================================================
 
-    report_lines = ["📊 本周库存与订单报告\n"]
+    report_lines = ["📊 Weekly Inventory and Order Report\n"]
     for _, row in df_summary.iterrows():
-        model = row["型号"]
+        model = row["型号"]  # Model
+        # Note: '产品名称' means 'Product Name' in Chinese
         name = df_inventory[df_inventory["型号"] == model]["产品名称"].values[0]
-        weekly_sales = row["数量"]
+        weekly_sales = row["数量"]  # Quantity
         forecast = forecast_product_demand(df_orders, model, days=7)
+        # Note: '当前库存' means 'Current Inventory' in Chinese
         current_stock = df_inventory[df_inventory["型号"] == model]["当前库存"].values[0]
 
         report_lines.append(
-            f"产品：{name}（型号：{model}）\n - 本周销量：{weekly_sales}\n - 未来7天预测：{forecast}\n - 当前库存：{current_stock}\n"
+            f"Product: {name} (Model: {model})\n - Weekly sales: {weekly_sales}\n - 7-day forecast: {forecast}\n - Current inventory: {current_stock}\n"
         )
 
-    # 生成报告内容
+    # Generate report content
     report_content = "\n".join(report_lines)
 
-    # 可选：生成图表并保存
+    # Optional: Generate chart and save
     fig, ax = plt.subplots()
+    # Note: '型号' means 'Model', '数量' means 'Quantity' in Chinese
     df_summary.plot(kind='bar', x='型号', y='数量', ax=ax, legend=False)
-    ax.set_title("📦 本周各产品销量")
-    ax.set_ylabel("销量")
+    ax.set_title("📦 Weekly Product Sales")
+    ax.set_ylabel("Sales")
     chart_path = "weekly_chart.png"
     plt.tight_layout()
     plt.savefig(chart_path)
 
-    # 发送邮件
-    subject = "【每周报告】库存与订单趋势分析"
-    to_email = "boyiwanglance@gmail.com"  # 可根据分类设置
+    # Send email
+    subject = "【Weekly Report】Inventory and Order Trend Analysis"
+    to_email = "boyiwanglance@gmail.com"  # Can be set based on category
     send_email(to_email, subject, report_content)
 
-    # 删除图表（如不需要保留）
+    # Delete chart (if not needed to keep)
     if os.path.exists(chart_path):
         os.remove(chart_path)
 
-    print("✅ 每周报告已生成并发送。")
+    print("✅ Weekly report generated and sent.")
 
-# 示例调用
+# Example call
 if __name__ == "__main__":
     generate_weekly_report()
